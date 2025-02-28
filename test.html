@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festival Vibes</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@700&display=swap');
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #222;
+            margin: 0;
+            overflow: hidden;
+            flex-direction: column;
+        }
+        .box {
+            width: 100px;
+            height: 100px;
+            background-color: #ffcc00;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            cursor: pointer;
+            transition: all 0.5s ease-in-out;
+            border-radius: 10px;
+            margin-top: 50px;
+        }
+        .festival {
+            background-color: #ff0077;
+            box-shadow: 0 0 20px #ff0077;
+            filter: blur(5px);
+        }
+        .fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+        }
+        .ramadan-decor {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100px;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/6/69/Ramadan_lanterns.jpg') repeat-x;
+            background-size: contain;
+            display: none;
+        }
+        .ramadan-theme {
+            background-color: #0d1b2a !important;
+            color: #ffcc00;
+        }
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #ffcc00;
+            padding: 40px;
+            border-radius: 15px;
+            font-size: 48px;
+            font-family: 'Scheherazade New', serif;
+            text-align: center;
+            display: none;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="ramadan-decor" id="ramadanDecor"></div>
+    <div class="box" id="box">🎁</div>
+    <div class="popup" id="popup">كل عام وانت بخير رمضان كريم 🌙✨</div>
+    <canvas class="fireworks" id="fireworks"></canvas>
+    <audio id="sound" src="https://voicemod.link/kl-sn-wnt--fb69-tn"></audio>
+    <script>
+        const box = document.getElementById("box");
+        const canvas = document.getElementById("fireworks");
+        const ctx = canvas.getContext("2d");
+        const ramadanDecor = document.getElementById("ramadanDecor");
+        const popup = document.getElementById("popup");
+        const sound = document.getElementById("sound");
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let fireworks = [];
+
+        function createFirework() {
+            let x = Math.random() * canvas.width;
+            let y = Math.random() * (canvas.height / 2);
+            let particles = [];
+            for (let i = 0; i < 70; i++) { // Increased particle count
+                let angle = (Math.PI * 2 * i) / 70;
+                let speed = Math.random() * 2 + 1; // Slower speed
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    alpha: 1,
+                    color: `rgb(255, 223, 0)` // Yellow color
+                });
+            }
+            fireworks.push(particles);
+        }
+
+        function animateFireworks() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            fireworks.forEach((particles, index) => {
+                particles.forEach(p => {
+                    p.x += p.vx * 0.8; // Slower movement
+                    p.y += p.vy * 0.8; // Slower movement
+                    p.alpha -= 0.01; // Even slower fading for longer visibility
+                    ctx.fillStyle = `rgba(255, 223, 0, ${p.alpha})`; // Yellow color with transparency
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                fireworks[index] = particles.filter(p => p.alpha > 0);
+            });
+            fireworks = fireworks.filter(p => p.length > 0);
+            requestAnimationFrame(animateFireworks);
+        }
+
+        box.addEventListener("click", () => {
+            box.classList.add("festival");
+            box.textContent = "🌙"; // Changing to a Ramadan vibe icon
+            document.body.classList.add("ramadan-theme"); // Apply Ramadan theme
+            setInterval(createFirework, 100); // Increased frequency of fireworks
+            ramadanDecor.style.display = "block";
+            popup.style.display = "block";
+            sound.play(); // Play the sound
+        });
+
+        animateFireworks();
+    </script>
+</body>
+</html>
